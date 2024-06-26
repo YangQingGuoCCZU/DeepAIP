@@ -36,8 +36,7 @@ pos_1365_train.fasta:this file contains 1365 AIPs used for model training
 ## 4.2 Extract features
 
 1. Extract Prot-T5 feature: cd to the DeepAIP/code dictionary, 
-and run "python3 prot-t5_feature_encoding.py",
-the Prot-T5 feature will be extracted.
+and run "python3 prot-t5_feature_encoding.py",the Prot-T5 feature will be extracted.
 
 ## 4.3 Train and test
 
