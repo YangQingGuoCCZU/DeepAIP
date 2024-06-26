@@ -30,7 +30,7 @@ pos_1365_train.fasta:this file contains 1365 AIPs used for model training
 
 # 4. How to Use
 
-## 4.1 Set up environment for HMM and ProtTrans
+## 4.1 Set up environment for ProtTrans
 1. Set ProtTrans follow procedure from https://huggingface.co/Rostlab/prot_t5_xl_uniref50/tree/main .
 
 ## 4.2 Extract features
