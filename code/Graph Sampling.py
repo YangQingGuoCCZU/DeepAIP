@@ -3,6 +3,9 @@ import numpy as np
 import pandas as pd
 import random
 
+#This function creates a fully connected graph using the input features.
+#Parameters:
+#features: A list of features, where each element is an array (or list) representing the feature of a node.
 def create_full_graph(features):
 
     G = nx.Graph()
@@ -13,7 +16,11 @@ def create_full_graph(features):
             if i != j:
                 G.add_edge(i, j, weight=1)
     return G
-
+#This function generates synthetic samples by randomly selecting nodes from the graph and computing the mean of their features.
+#graph: The input graph with nodes containing features.
+#num_samples: The number of synthetic samples to generate 
+#min_nodes: Minimum number of nodes to select for each sample 
+#max_nodes: Maximum number of nodes to select for each sample 
 def generate_synthetic_samples(graph, num_samples=1, min_nodes=15, max_nodes=50, seed=None):
     synthetic_samples = []
     if seed is not None:
@@ -34,6 +41,11 @@ def generate_synthetic_samples(graph, num_samples=1, min_nodes=15, max_nodes=50,
         mean_feature = np.mean(features, axis=0)
         synthetic_samples.append(mean_feature)
     return synthetic_samples
+#This function processes the input dataset, generates synthetic samples for both positive and negative classes, and writes the generated data to a CSV file.
+#file_path: The path to the CSV file containing the dataset.
+#num_samples_pos: Number of synthetic samples to generate for the positive class (default is 5).
+#num_samples_neg: Number of synthetic samples to generate for the negative class (default is 5).
+#seed: The seed for random number generation to ensure reproducibility (default is 2024).
 
 def process_data_and_generate_samples(file_path, num_samples_pos=5, num_samples_neg=5, seed=2024):
     df = pd.read_csv(file_path)
