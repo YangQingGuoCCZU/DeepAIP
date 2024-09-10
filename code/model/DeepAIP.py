@@ -6,7 +6,15 @@ from sklearn import metrics
 from LossFunction.focalLoss import FocalLoss_v2
 from utility import save_prob_label, masked_softmax, read_file_list_from_seq_label
 
+#This class implements a contextual attention mechanism,
+# which combines local and global information from input embeddings
+# using convolutional and attention operations.
 
+#q_input_dim: Dimension of the query input
+#v_input_dim: Dimension of the value input
+# This corresponds to the size of the pre-trained model embeddings.
+#qk_dim: Dimension of the query/key vectors in the attention mechanism
+#v_dim: Dimension of the value vectors
 class Contextual_Attention(nn.Module):
     def __init__(self, q_input_dim, v_input_dim=391, qk_dim=391, v_dim=391):
         super(Contextual_Attention, self).__init__()
@@ -26,9 +34,9 @@ class Contextual_Attention(nn.Module):
         atten = masked_softmax((torch.bmm(Q, K.permute(0, 2, 1))) * self._norm_fact, seqlengths)
         output = torch.bmm(atten, V)
         return output + V
-
+#This function is used to prepare batches of training data for input into the model.
+# Specifically, it handles padding sequences to ensure that all inputs in a batch have the same length.
 def coll_paddding(batch_traindata):
-
     batch_traindata.sort(key=lambda data: len(data[0]), reverse=True)
     feature0 = []
     f0agv = []
@@ -48,7 +56,8 @@ def coll_paddding(batch_traindata):
     feature_fusion = torch.nn.utils.rnn.pad_sequence(feature_fusion, batch_first=True, padding_value=0)
     train_y = torch.nn.utils.rnn.pad_sequence(train_y, batch_first=True, padding_value=0)
     return feature0, f0agv, feature_fusion, train_y, torch.tensor(data_length)
-
+#This class is a custom dataset class for loading protein data and feature fusion data from CSV files for bioinformatics tasks.
+#It inherits from torch.utils.data.Dataset and implements methods to load and process data.
 class BioinformaticsDataset(Dataset):
     def __init__(self, X_prot, X_feature_fusion):
         self.X_prot = X_prot
@@ -71,7 +80,8 @@ class BioinformaticsDataset(Dataset):
         return prot, agv, feature_fusion, label
     def __len__(self):
         return len(self.X_prot)
-
+#This class defines a neural network model for predicting anti-inflammatory peptides using protein sequences and feature fusion data.
+#It leverages a contextual attention mechanism (Contextual_Attention class) and convolutional layers for feature extraction.
 class DeepAIPModule(nn.Module):
     def __init__(self):
         self.ca = Contextual_Attention(q_input_dim=391, v_input_dim=391)
@@ -98,18 +108,19 @@ class DeepAIPModule(nn.Module):
         x = self.drop(x)
         x = self.fc4(x)
         return x
-
+#The train() function is designed to train the DeepAIPModule model on bioinformatics datasets
+#It utilizes a Focal Loss function for addressing class imbalance and applies Adam optimizer for model parameter updates.
 def train():
     train_set = BioinformaticsDataset(prot_train,fusion_train)
-    model = DeepAIPModule()
-    epochs = 300
-    model = model.to(device)
+    model = DeepAIPModule() #An instance of the DeepAIPModule neural network model, responsible for performing classification on protein sequences.
+    epochs = 300            #The number of training iterations
+    model = model.to(device) # Ensures that the model is moved to either GPU or CPU for computation.
     train_loader = DataLoader(dataset=train_set, batch_size=256, shuffle=True, num_workers=12, pin_memory=True,
                               persistent_workers=True, collate_fn=coll_paddding)
     best_val_loss = 2000
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
-    per_cls_weights = torch.FloatTensor([0.25, 0.75]).to(device)
-    fcloss = FocalLoss_v2(alpha=per_cls_weights, gamma=2)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001) # Uses the Adam optimizer with a learning rate of 0.0001 to adjust the model's weights during training.
+    per_cls_weights = torch.FloatTensor([0.25, 0.75]).to(device) #A tensor that adjusts the class weights, addressing class imbalance by giving more importance to the minority class
+    fcloss = FocalLoss_v2(alpha=per_cls_weights, gamma=2) #The Focal Loss function, which focuses on hard-to-classify examples and is useful in imbalanced datasets.
     model.train()
     epochss = []
     losses = []
@@ -139,8 +150,10 @@ def train():
                 print("Save model, best_val_loss: ", best_val_loss)
 
 def test():
+    #Dataset and DataLoader Initialization
     test_set = BioinformaticsDataset(prot_test,fusion_test)
     test_load = DataLoader(dataset=test_set, batch_size=256, num_workers=12, pin_memory=True, persistent_workers=True, collate_fn=coll_paddding)
+    #Model Loading
     model = DeepAIPModule()
     model = model.to(device)
     print("==========================Test RESULT================================")
@@ -170,7 +183,7 @@ def test():
         recall = tp / (tp + fn)
         f1score = 2 * tp / (2 * tp + fp + fn)
         youden = sensitivity + specificity - 1
-
+        #Results Storage and Output
         metrics_dict = {
             'accuracy': metrics.accuracy_score(arr_labels, arr_labels_hyps),
             'balanced_accuracy': metrics.balanced_accuracy_score(arr_labels, arr_labels_hyps),
@@ -196,15 +209,17 @@ def test():
 
     return acc, mcc
 if __name__ == "__main__":
+    #CUDA Availability Check
     cuda = torch.cuda.is_available()
     torch.cuda.set_device(0)
     print("use cuda: {}".format(cuda))
+    #Dataset Filenames
     device = torch.device("cuda" if cuda else "cpu")
     fusion_train=['prot_t5_pca_gs_equal_train.csv']
     prot_train  =['prot_t5_pca_gs_equal_train.csv']
     fusion_test=['prot-t5_pca_test.csv']
     prot_test  =['prot-t5_pca_test.csv']
-    train()
+    #train()
     test()
 
 
