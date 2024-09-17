@@ -28,6 +28,10 @@ neg_2218_train.fasta:this file contains 2218 Non-AIPs used for model training
 
 pos_1365_train.fasta:this file contains 1365 AIPs used for model training
 
+Raw data stores the dataset we use, and data.fasta is the basic dataset we use for our experiments. close_natural distribution_data.fasta is a dataset that we collect that is close to the distribution of the natural world
+
+prot-t5_trian.csv are the training features we use in our experiments. prot-t5_test.csv are the training features we use in our experiments.
+
 # 4. How to Use
 
 ## 4.1 Set up environment for ProtTrans
@@ -40,5 +44,6 @@ and run "python3 prot-t5_feature_encoding.py",the Prot-T5 feature will be extrac
 
 ## 4.3 Train and test
 
-1. cd to the DeepAIP/code dictionary,and run "python3 DeepAIP.py.py" for training and testing the model.
+1. cd to the DeepAIP/code dictionary,and run "python3 DeepAIP.py" for training and testing the model.
 
+2.We provide a Google colab code to run our program, the link is as follows: https://colab.research.google.com/drive/1idDwMSi0PpUnHjxPdhrCSqb2WHD1p-jP?usp=sharing
