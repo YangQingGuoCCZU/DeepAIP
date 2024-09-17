@@ -64,7 +64,7 @@ class BioinformaticsDataset(Dataset):
         self.X_feature_fusion = X_feature_fusion
     def __getitem__(self, index):
         filename_prot = self.X_prot[index]
-        df_prot = pd.read_csv('../DataSet/enhance/' + filename_prot)
+        df_prot = pd.read_csv('../DataSet/' + filename_prot)
         prot = df_prot.iloc[:, 1:].values
         if prot.dtype == object:
             prot = prot.astype(float)
@@ -72,7 +72,7 @@ class BioinformaticsDataset(Dataset):
         agv = torch.mean(prot, dim=0)
         agv = agv.repeat(prot.shape[0], 1)
         filename_feature_fusion = self.X_feature_fusion[index]
-        df_feature_fusion = pd.read_csv('../DataSet/enhance/' + filename_feature_fusion)
+        df_feature_fusion = pd.read_csv('../DataSet/' + filename_feature_fusion)
         feature_fusion = df_feature_fusion.iloc[:, 1:].values
         feature_fusion = torch.tensor(feature_fusion, dtype=torch.float)
         label = df_prot.iloc[:, 0].values
@@ -215,10 +215,10 @@ if __name__ == "__main__":
     print("use cuda: {}".format(cuda))
     #Dataset Filenames
     device = torch.device("cuda" if cuda else "cpu")
-    fusion_train=['prot_t5_pca_gs_equal_train.csv']
-    prot_train  =['prot_t5_pca_gs_equal_train.csv']
-    fusion_test=['prot-t5_pca_test.csv']
-    prot_test  =['prot-t5_pca_test.csv']
+    fusion_train=['prot_t5_train.csv']
+    prot_train  =['prot_t5_train.csv']
+    fusion_test=['prot-t5_test.csv']
+    prot_test  =['prot-t5_test.csv']
     #train()
     test()
 
